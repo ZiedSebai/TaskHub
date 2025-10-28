@@ -230,6 +230,10 @@ export function Board() {
         open={membersPanelOpen}
         onOpenChange={setMembersPanelOpen}
         members={board.members || []}
+        projectId={id!}
+        onMembersChange={() => {
+          queryClient.invalidateQueries({ queryKey: ['board', id] });
+        }}
       />
     </div>
   );

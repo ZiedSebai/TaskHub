@@ -1,28 +1,44 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from '../../components/ui/dialog';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';
-import { Users } from 'lucide-react';
+import { Button } from '../../components/ui/button';
+import { Users, UserPlus } from 'lucide-react';
 import type { User } from '../../types';
+import { AddMemberDialog } from './add-member-dialog';
 
 interface MembersPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   members: Array<{ userId: string; user: User; role: string }>;
+  projectId: string;
+  onMembersChange: () => void;
 }
 
-export function MembersPanel({ open, onOpenChange, members }: MembersPanelProps) {
-  // Safe members array with filtering out invalid entries
+export function MembersPanel({ open, onOpenChange, members, projectId, onMembersChange }: MembersPanelProps) {
+  const [showAddMember, setShowAddMember] = useState(false);
   const validMembers = (members || []).filter(member => member?.user?.email);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogClose onClose={() => onOpenChange(false)} />
-        <DialogHeader>
-          <DialogTitle>Project Members</DialogTitle>
-          <DialogDescription>
-            View all members of this project
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogClose onClose={() => onOpenChange(false)} />
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Project Members</span>
+              <Button
+                size="sm"
+                onClick={() => setShowAddMember(true)}
+                className="gap-2"
+              >
+                <UserPlus className="h-4 w-4" />
+                Add Member
+              </Button>
+            </DialogTitle>
+            <DialogDescription>
+              View and manage members of this project
+            </DialogDescription>
+          </DialogHeader>
         <div className="space-y-2">
           {validMembers.length > 0 ? (
             validMembers.map((member) => (
@@ -51,7 +67,19 @@ export function MembersPanel({ open, onOpenChange, members }: MembersPanelProps)
             </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <AddMemberDialog
+        open={showAddMember}
+        onClose={() => setShowAddMember(false)}
+        projectId={projectId}
+        currentMembers={validMembers}
+        onMemberAdded={() => {
+          onMembersChange();
+          setShowAddMember(false);
+        }}
+      />
+    </>
   );
 }

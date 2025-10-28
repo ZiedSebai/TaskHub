@@ -6,5 +6,10 @@ export const usersApi = {
     const { data } = await apiClient.get<User[]>('/users');
     return data;
   },
+
+  search: async (query: string): Promise<User[]> => {
+    const { data } = await apiClient.get<User[]>(`/users/search?q=${encodeURIComponent(query)}`);
+    return data;
+  },
 };
 
